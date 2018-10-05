@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
+	"strconv"
 
 	"github.com/golang-migrate/migrate"
 	_ "github.com/golang-migrate/migrate/database/mysql"
@@ -10,6 +12,8 @@ import (
 )
 
 func main() {
+
+	args := os.Args[1:]
 
 	conf, err := ioutil.ReadFile("conf.json")
 	if err != nil {
@@ -29,7 +33,22 @@ func main() {
 		panic(err)
 	}
 
-	m.Down()
+	if len(args) == 0 {
+		m.Up()
+		return
+	}
+
+	if args[0] == "--down" {
+		m.Down()
+	} else if args[0] == "--up" {
+		m.Up()
+	} else if args[0] == "--version" {
+		i, _ := strconv.ParseUint(args[1], 10, 0)
+		m.Migrate(uint(i))
+	} else {
+		m.Up()
+		return
+	}
 }
 
 type config struct {

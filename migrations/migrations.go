@@ -11,11 +11,15 @@ import (
 	_ "github.com/golang-migrate/migrate/source/file"
 )
 
+type config struct {
+	DBConnString string `json:"db_conn_string"`
+}
+
 func main() {
 
 	args := os.Args[1:]
 
-	conf, err := ioutil.ReadFile("conf.json")
+	conf, err := ioutil.ReadFile("../conf.json")
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +29,7 @@ func main() {
 
 	// file://migrations is actually a folder spec. weird
 	m, err := migrate.New(
-		"file://migrations",
+		"file://scripts",
 		config.DBConnString,
 	)
 
@@ -49,8 +53,4 @@ func main() {
 		m.Up()
 		return
 	}
-}
-
-type config struct {
-	DBConnString string `json:"db_conn_string"`
 }

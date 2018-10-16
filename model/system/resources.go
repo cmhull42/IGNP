@@ -2,8 +2,8 @@ package system
 
 // Resource - Resources table model
 type Resource struct {
-	LocationID   uint64
+	ResourceID   uint64
 	ResourceType uint
 	Name         string
-	Capacity     uint
+	Rarity       float32
 }

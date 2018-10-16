@@ -11,7 +11,10 @@ import (
 	sysmodel "github.com/cmhull42/ignp/model/system"
 )
 
+const locationPath string = "data/system/locations.csv"
 const resourcePath string = "data/system/resources.csv"
+const resourceLocationPath string = "data/system/resourcelocations.csv"
+const resourceTypesPath string = "data/system/resourcetypes.csv"
 
 // parseError is a local error type used to handle bad csv data
 type parseError string
@@ -37,6 +40,48 @@ func (cmb CSVModelBuilder) ReadResources() ([]sysmodel.Resource, error) {
 		resources[i] = r[i].(sysmodel.Resource)
 	}
 	return resources, nil
+}
+
+// ReadLocations implements ISeedModelBuilder.ReadLocations
+func (cmb CSVModelBuilder) ReadLocations() ([]sysmodel.Location, error) {
+	r, err := readType(locationPath, &sysmodel.Location{})
+	if err != nil {
+		return nil, err
+	}
+
+	locations := make([]sysmodel.Location, len(r))
+	for i := range r {
+		locations[i] = r[i].(sysmodel.Location)
+	}
+	return locations, nil
+}
+
+// ReadResourceLocations implements ISeedModelBuilder.ReadResourceLocations
+func (cmb CSVModelBuilder) ReadResourceLocations() ([]sysmodel.ResourceLocation, error) {
+	r, err := readType(resourceLocationPath, &sysmodel.ResourceLocation{})
+	if err != nil {
+		return nil, err
+	}
+
+	resourceLocations := make([]sysmodel.ResourceLocation, len(r))
+	for i := range r {
+		resourceLocations[i] = r[i].(sysmodel.ResourceLocation)
+	}
+	return resourceLocations, nil
+}
+
+// ReadResourceTypes implements ISeedModelBuilder.ReadResourceTypes
+func (cmb CSVModelBuilder) ReadResourceTypes() ([]sysmodel.ResourceType, error) {
+	r, err := readType(resourceTypesPath, &sysmodel.ResourceType{})
+	if err != nil {
+		return nil, err
+	}
+
+	resourceTypes := make([]sysmodel.ResourceType, len(r))
+	for i := range r {
+		resourceTypes[i] = r[i].(sysmodel.ResourceType)
+	}
+	return resourceTypes, nil
 }
 
 func readType(parsePath string, parseType interface{}) (res []interface{}, perr error) {
@@ -103,6 +148,10 @@ func setField(field reflect.Value, val string) (err error) {
 		field.SetInt(v)
 	case reflect.String:
 		field.SetString(val)
+	case reflect.Float32, reflect.Float64:
+		var v float64
+		v, err = strconv.ParseFloat(val, field.Type().Bits())
+		field.SetFloat(v)
 	default:
 		panic(parseError("seed: tried to parse a type i can't handle: " + field.Type().Name()))
 	}

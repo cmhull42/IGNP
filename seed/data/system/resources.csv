@@ -1,2 +1,6 @@
-LocationID,ResourceType,Name,Capacity
-654654,1,This,5
+ResourceID,ResourceType,Name,Rarity
+1,1,Basic Metal,0.02
+2,1,Rare Metal,0.01
+3,2,Basic Minerals,0.02
+4,2,Rare Minerals,0.01
+5,3,Hard Wood ( ͡° ͜ʖ ͡°),0.03

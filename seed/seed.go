@@ -20,6 +20,8 @@ func main() {
 	//	return
 	//}
 
+	fmt.Println()
+
 	operation := "--seed"
 	if len(args) > 0 {
 		operation = args[0]

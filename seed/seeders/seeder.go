@@ -21,5 +21,5 @@ func (s Seeder) Seed() {
 		panic(err)
 	}
 
-	fmt.Println(resources[0].Capacity)
+	fmt.Println(resources[0])
 }

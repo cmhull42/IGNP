@@ -2,6 +2,7 @@ package seeders
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"os"
 	"reflect"
@@ -74,13 +75,12 @@ func readType(parsePath string, parseType interface{}) (res []interface{}, perr 
 		newV := reflect.New(t).Elem()
 
 		if len(record) != t.NumField() {
-			panic(parseError("Wrong field count on line" + string(lineCount)))
+			panic(parseError("wrong field count on line" + string(lineCount)))
 		}
 
 		for i, v := range fieldNames {
-			err := setField(newV.FieldByName(v), record[i])
-			if err != nil {
-				return nil, err
+			if setField(newV.FieldByName(v), record[i]) != nil {
+				return nil, fmt.Errorf("seed: cannot convert value from string to %s: %v", newV.Type().Name(), err)
 			}
 		}
 
@@ -91,37 +91,22 @@ func readType(parsePath string, parseType interface{}) (res []interface{}, perr 
 	return results, nil
 }
 
-func setField(field reflect.Value, val string) error {
-	switch t := field.Interface().(type) {
-	case uint:
-		v, err := strconv.ParseUint(val, 10, 0)
-		if err != nil {
-			return parseError("seed: Cannot convert " + val + " to uint")
-		}
+func setField(field reflect.Value, val string) (err error) {
+	switch field.Type().Kind() {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		var v uint64
+		v, err = strconv.ParseUint(val, 10, field.Type().Bits())
 		field.SetUint(v)
-	case uint64:
-		v, err := strconv.ParseUint(val, 10, 64)
-		if err != nil {
-			return parseError("seed: Cannot convert " + val + " to uint64")
-		}
-		field.SetUint(v)
-	case int:
-		v, err := strconv.ParseInt(val, 10, 0)
-		if err != nil {
-			return parseError("seed: Cannot convert " + val + " to int")
-		}
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		var v int64
+		v, err = strconv.ParseInt(val, 10, 0)
 		field.SetInt(v)
-	case int64:
-		v, err := strconv.ParseInt(val, 10, 64)
-		if err != nil {
-			return parseError("seed: Cannot convert " + val + " to int64")
-		}
-		field.SetInt(v)
-	case string:
+	case reflect.String:
 		field.SetString(val)
 	default:
-		return parseError("seed: tried to parse a type i can't handle: " + reflect.TypeOf(t).Name())
+		panic(parseError("seed: tried to parse a type i can't handle: " + field.Type().Name()))
 	}
+
 	return nil
 }
 

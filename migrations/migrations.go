@@ -38,19 +38,34 @@ func main() {
 	}
 
 	if len(args) == 0 {
-		m.Up()
+		if err := m.Up(); err != nil {
+			panic(err)
+		}
 		return
 	}
 
 	if args[0] == "--down" {
-		m.Down()
+		if err := m.Down(); err != nil {
+			panic(err)
+		}
 	} else if args[0] == "--up" {
-		m.Up()
+		if err := m.Up(); err != nil {
+			panic(err)
+		}
 	} else if args[0] == "--version" {
 		i, _ := strconv.ParseUint(args[1], 10, 0)
-		m.Migrate(uint(i))
+		if err := m.Migrate(uint(i)); err != nil {
+			panic(err)
+		}
+	} else if args[0] == "--force" {
+		i, _ := strconv.ParseInt(args[1], 10, 0)
+		if err := m.Force(int(i)); err != nil {
+			panic(err)
+		}
 	} else {
-		m.Up()
+		if err := m.Up(); err != nil {
+			panic(err)
+		}
 		return
 	}
 }

@@ -1,4 +1,4 @@
-ResourceID,ResourceType,Name,Rarity
+ID,ResourceType,Name,Rarity
 1,1,Basic Metal,0.02
 2,1,Rare Metal,0.01
 3,2,Basic Minerals,0.02

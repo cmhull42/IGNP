@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 
-	"github.com/cmhull42/ignp/api/routes"
+	"github.com/cmhull42/ignp/cmd/ignp-api/routes"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -40,7 +41,17 @@ func buildRoutes(db *sqlx.DB) *chi.Mux {
 
 func main() {
 
-	conf, err := ioutil.ReadFile("../conf.json")
+	var confFile string
+	flag.StringVar(&confFile, "conf", "", "path of the config file")
+
+	flag.Parse()
+
+	if confFile == "" {
+		flag.PrintDefaults()
+		return
+	}
+
+	conf, err := ioutil.ReadFile(confFile)
 	if err != nil {
 		panic(err)
 	}

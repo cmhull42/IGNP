@@ -81,7 +81,7 @@ func populateTables(tx *sql.Tx, s Seeder) (err error) {
 
 	for _, r := range resources {
 		if _, err := tx.Exec("insert into SystemResources (id,resourcetype,name,rarity) values (?, ?, ?, ?)",
-			r.ResourceID,
+			r.ID,
 			r.ResourceType,
 			r.Name,
 			r.Rarity,

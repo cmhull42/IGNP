@@ -20,18 +20,36 @@ func ResourceRoutes(e Env) http.Handler {
 
 // GetResource returns one single resource identified by the resourceid param
 func (e Env) GetResource(w http.ResponseWriter, r *http.Request) {
-	resource := sysmodel.Resource{}
-	err := e.db.Get(&resource, "select * from SystemResources where id=?", chi.URLParam(r, "resourceID"))
+	resource := []sysmodel.Resource{}
+	err := e.db.Select(&resource, "select * from SystemResources where id=?", chi.URLParam(r, "resourceID"))
 	if err != nil {
+		http.Error(w, http.StatusText(500), 500)
+		return
+	}
+
+	if len(resource) == 0 {
+		http.Error(w, http.StatusText(404), 404)
+		return
+	}
+
+	w.WriteHeader(200)
+	render.JSON(w, r, resource[0])
+}
+
+// GetResources returns all resources
+func (e Env) GetResources(w http.ResponseWriter, r *http.Request) {
+	resource := []sysmodel.Resource{}
+	err := e.db.Select(&resource, "select * from SystemResources")
+	if err != nil {
+		http.Error(w, http.StatusText(500), 500)
+		return
+	}
+
+	if len(resource) == 0 {
 		http.Error(w, http.StatusText(404), 404)
 		return
 	}
 
 	w.WriteHeader(200)
 	render.JSON(w, r, resource)
-}
-
-// GetResources returns all resources
-func (e Env) GetResources(w http.ResponseWriter, r *http.Request) {
-
 }
